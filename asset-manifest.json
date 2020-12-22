@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/limit-order-book/static/css/main.ab7136cd.chunk.css",
-    "main.js": "/limit-order-book/static/js/main.910cb99a.chunk.js",
-    "main.js.map": "/limit-order-book/static/js/main.910cb99a.chunk.js.map",
+    "main.css": "/limit-order-book/static/css/main.05f93405.chunk.css",
+    "main.js": "/limit-order-book/static/js/main.0edcd658.chunk.js",
+    "main.js.map": "/limit-order-book/static/js/main.0edcd658.chunk.js.map",
     "runtime-main.js": "/limit-order-book/static/js/runtime-main.99f8d586.js",
     "runtime-main.js.map": "/limit-order-book/static/js/runtime-main.99f8d586.js.map",
     "static/js/2.cc248a4f.chunk.js": "/limit-order-book/static/js/2.cc248a4f.chunk.js",
@@ -10,13 +10,13 @@
     "static/js/3.b0567a8e.chunk.js": "/limit-order-book/static/js/3.b0567a8e.chunk.js",
     "static/js/3.b0567a8e.chunk.js.map": "/limit-order-book/static/js/3.b0567a8e.chunk.js.map",
     "index.html": "/limit-order-book/index.html",
-    "static/css/main.ab7136cd.chunk.css.map": "/limit-order-book/static/css/main.ab7136cd.chunk.css.map",
+    "static/css/main.05f93405.chunk.css.map": "/limit-order-book/static/css/main.05f93405.chunk.css.map",
     "static/js/2.cc248a4f.chunk.js.LICENSE.txt": "/limit-order-book/static/js/2.cc248a4f.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.99f8d586.js",
     "static/js/2.cc248a4f.chunk.js",
-    "static/css/main.ab7136cd.chunk.css",
-    "static/js/main.910cb99a.chunk.js"
+    "static/css/main.05f93405.chunk.css",
+    "static/js/main.0edcd658.chunk.js"
   ]
 }
