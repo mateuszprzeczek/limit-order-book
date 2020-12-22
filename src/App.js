@@ -1,23 +1,22 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
+import { Router, Link } from "@reach/router";
+import { Add } from "./OrderBook/Add";
+import { Inventory } from "./Inventory";
+
 import './App.css';
 
 function App() {
+  const [orders, setOrders] = useState([]);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     <Link to="/">
+                    <h1>Limit Order Book v1</h1>
+                </Link>
+                <Router>
+                    <Add orders={orders} setOrders={setOrders} path="/add"></Add>
+                    <Inventory orders={orders} path="/" />
+                </Router>
     </div>
   );
 }
