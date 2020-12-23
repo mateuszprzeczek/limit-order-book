@@ -17,7 +17,7 @@ export const Inventory = ({ orders }) => {
     return (
         <React.Fragment>
             {orders.length === 0 ? <h3>No Orders</h3> : orderComponents}
-            <Link to="/add">Zarządzaj inwentarzem</Link>
+            <Link to="/">Menage orders</Link>
         </React.Fragment>
     );
 };
