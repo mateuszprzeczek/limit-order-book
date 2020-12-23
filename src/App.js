@@ -34,7 +34,7 @@ function App() {
   const buyerComponents = buyers.map((order) => {
     console.log(order)
     return (
-      <div className="row" key={order.id}>
+      <div className="buyer" key={order.id}>
         <Order
             id={order.id}
             side={order.side}
@@ -49,7 +49,7 @@ function App() {
 
   const sellersComponent = sellers.map((seller) => {
     return (
-      <div key={seller.id}>
+      <div className="seller" key={seller.id}>
        <Order 
         id={seller.id}
         side={seller.side}
@@ -61,22 +61,6 @@ function App() {
    )
   });
 
-// const changeOrders = (orders, index, q) => {
-//   const newOrders = orders.slice();
-//   const order = newOrders[index];
-//   const newOrder = {
-//     ...order,
-//     quantity: q,
-//   };
-//   newOrders[index] = newOrder;
-//     return newOrders;
-//   };
-
-
-
-
-
-
   return (
     <div className="App">
      <Link to="/">
@@ -86,7 +70,7 @@ function App() {
                     <Add orders={orders} setOrders={setOrders} buyers={buyers} setBuyers={setBuyers} sellers={sellers} setSellers={setSellers} path="/"></Add>
                     <Inventory orders={orders} path="/" />
                 </Router>
-                {orderComponents}
+                {/* {orderComponents} */}
                 {buyerComponents}
                 {sellersComponent}
     </div>

@@ -7,7 +7,7 @@ export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers 
     const [limitPrice, setLimitPrice] = useState("");
     const [quantity, setQuantity] = useState("");
     const [active, setActive] = useState(true);
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState('OK')
 
 
     const sides = ["Buy", "Sell", "Cancel"];
@@ -49,10 +49,10 @@ export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers 
     const checkSellers = (order) => {
         if (sellers.length) {
             const newSellers = sellers.slice();
-            const matchingSellers = newSellers.filter(item => item.limitPrice <= order.limitPrice);
+            const matchingSellers = newSellers.filter(item => parseInt(item.limitPrice) <= parseInt(order.limitPrice));
             sortMatchingSellers(matchingSellers)
             for (let seller of matchingSellers) {
-                if (seller.quantity <= order.quantity) {
+                if (seller.quantity <= order.quantity && seller.active) {
                     const newQuantity = order.quantity - seller.quantity;
                     if(newQuantity < 0) {
                         continue;
@@ -75,7 +75,7 @@ export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers 
                     setBuyers(b);
                 }
 
-                if (seller.quantity > order.quantity) {
+                if (seller.quantity > order.quantity && seller.active) {
                     const newQuantity = seller.quantity - order.quantity;
                     if(newQuantity < 0) {
                         continue;
@@ -104,10 +104,10 @@ export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers 
     const checkBuyers = (order) => {
         if (buyers.length) {
             const newBuyers = buyers.slice();
-            const matchingBuyers = newBuyers.filter(item => item.limitPrice >= order.limitPrice);
+            const matchingBuyers = newBuyers.filter(item => parseInt(item.limitPrice) >= parseInt(order.limitPrice));
             sortMatchingSellers(matchingBuyers)
             for (let buyer of matchingBuyers) {
-                if (buyer.quantity <= order.quantity) {
+                if (buyer.quantity <= order.quantity && buyer.active) {
                     const newQuantity = order.quantity - buyer.quantity;
                     if(newQuantity < 0) {
                         continue;
@@ -130,7 +130,7 @@ export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers 
                     setSellers(b);
                 }
 
-                if (buyer.quantity > order.quantity) {
+                if (buyer.quantity > order.quantity && buyer.active) {
                     const newQuantity = buyer.quantity - order.quantity;
                     if(newQuantity < 0) {
                         continue;
