@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import useDropdown from "../hooks/useDropdown";
 import { InputComponent } from "../InputComponent";
 
-export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers }) => {
+export const Add = ({ orders, setOrders, buyers, setBuyers  }) => {
     const [id, setId] = useState("");
     const [limitPrice, setLimitPrice] = useState("");
     const [quantity, setQuantity] = useState("");
     const [active, setActive] = useState(true);
     const [message, setMessage] = useState('OK')
+
+    const [sellers, setSellers] = useState([]);
 
 
     const sides = ["Buy", "Sell", "Cancel"];
@@ -16,165 +18,247 @@ export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers 
     const addOrder = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        const newOrder = {
-            id: id,
-            side: side,
-            limitPrice: limitPrice,
-            quantity: quantity,
-            message: message,
-            active: active,
-        };
-        const newOrders = [...orders, newOrder];
-        setOrders(newOrders);
+            const newOrder = {
+                id: id,
+                side: side,
+                limitPrice: limitPrice,
+                quantity: quantity,
+                message: message,
+                active: true,
+            };
 
-        addOrderToSide(newOrder)
+            if (newOrder.side === "Buy") {
+                if(!orders.length) {
+                    const newOrders = [...orders, newOrder];
+                    setOrders(newOrders)
+                }
+                const activeSellers = orders.filter(el => el.active).filter(el => el.limitPrice <= newOrder.limitPrice)
+                const sellOrders = activeSellers.filter(el => el.side === "Sell")
+                
+                if(sellOrders.length) {
+                    sortOrders(sellOrders)
+                    const length = sellOrders.length;
+                    let tmp = 0;
+                    let updOrder = null;
+                    let updSellers = [];
+                    let newSeller = null;
+                    let newSellers = [];
+                    for (let seller of sellOrders) {
+                        if(newOrder.quantity === 0) {
+                            break;
+                        }
+                        if(seller.limitPrice <= newOrder.limitPrice) {
+                            let sQuantity = seller.quantity;
+                            let ordQuantity = newOrder.quantity;
+                            const max = Math.max(sQuantity, ordQuantity);
+                            for(let i = 0; i <= max; i++) {
+                                sQuantity--
+                                ordQuantity--
+                                if(ordQuantity === 0 || sQuantity === 0) {
+                                    break;
+                                }
+                            }
+                            if (sQuantity === 0) {
+                                 updSellers = orders.filter(el => el.id !== seller.id)
+                                const m = `fully matched with ${seller.id} (${seller.quantity} @ ${seller.limitPrice})`;
+                                 newSeller = {
+                                    id: seller.id,
+                                    side: seller.side,
+                                    limitPrice: seller.limitPrice,
+                                    quantity: 0,
+                                    message: `Fully matched with ${newOrder.id}`,
+                                    active: false,   
+                                }
+                                newOrder.quantity = ordQuantity
+                                newOrder.message = ` ${m}`
+
+                                 newSellers = [...updSellers, newSeller, newOrder];
+                                 setOrders(newSellers)
+                                
+                            }
+                            if (ordQuantity === 0) {
+                                updSellers = orders.filter(el => el.id !== seller.id)
+                                let m = null;
+                                if(sQuantity > 0) {
+                                    m = `and ${seller.id} (${sQuantity - ordQuantity} @ ${seller.limitPrice})`
+                                } else {
+                                    m = `and ${seller.id} (${sQuantity} @ ${seller.limitPrice})`
+                                }
+                                 newSeller = {
+                                    id: seller.id,
+                                    side: seller.side,
+                                    limitPrice: seller.limitPrice,
+                                    active: true,
+                                    quantity: sQuantity,
+                                    message: ''
+                                }
+                                newOrder.quantity = ordQuantity
+                                 updOrder = {
+                                    id: newOrder.id,
+                                    side: newOrder.side,
+                                    limitPrice: newOrder.limitPrice,
+                                    quantity: ordQuantity,
+                                    message:  ` ${m}`,
+                                    active: false
+                                }
+                                 newSellers = [...updSellers, newSeller, updOrder]
+                                setOrders(newSellers)
+                            }
+                        } else {
+                            tmp += 1;
+                        }
+                    }
+                    
+                    if(tmp === length) {
+                        const newOrders = [...orders, newOrder];
+                        setOrders(newOrders);
+                    } 
+                } else {
+                    const newOrders = [...orders, newOrder];
+                        setOrders(newOrders);
+                }
+            } 
+            if (newOrder.side === "Sell") {
+                if(!orders.length) {
+                    const newOrders = [...orders, newOrder];
+                    setOrders(newOrders)
+                }
+                const activeBuyers = orders.filter(el => el.active).filter(el => el.limitPrice >= newOrder.limitPrice)
+                const buyOrders = activeBuyers.filter(el => el.side === "Buy")
+
+                if(orders.length) {
+                    sortOrders(buyOrders)
+                    const length = buyOrders.length;
+                    let tmp = 0;
+                    let updOrder = null;
+                    let updBuyers = [];
+                    let newBuyer = null;
+                    let newBuyers = [];
+                    for (let buyer of buyOrders) {
+                        if(newOrder.quantity === 0) {
+                            break;
+                        }
+                        if(buyer.limitPrice >= newOrder.limitPrice) {
+                            let bQuantity = buyer.quantity;
+                            let ordQuantity = newOrder.quantity;
+                            const max = Math.max(bQuantity, ordQuantity);
+                            for(let i = 0; i <= max; i++) {
+                                bQuantity--
+                                ordQuantity--
+                                if(ordQuantity === 0 || bQuantity === 0) {
+                                    break;
+                                }
+                            }
+                            if (bQuantity === 0) {
+                                 updBuyers = orders.filter(el => el.id !== buyer.id)
+                                const m = `Partially matched with ${buyer.id} (${buyer.quantity} @ ${buyer.limitPrice})`;
+                                 newBuyer = {
+                                    id: buyer.id,
+                                    side: buyer.side,
+                                    limitPrice: buyer.limitPrice,
+                                    quantity: 0,
+                                    message: `Fully matched with ${newOrder.id}`,
+                                    active: false,
+                                }
+                                newOrder.quantity = ordQuantity;
+                                newOrder.message = `${newOrder.message} ${m}`;
+
+                                const newBuyers = [...updBuyers, newBuyer, newOrder]
+                                setOrders(newBuyers)
+                            }
+                            if (ordQuantity === 0) {
+                                 updBuyers = orders.filter(el => el.id !== buyer.id)
+                                let m = null;
+                                if(bQuantity > 0) {
+                                    m = `fully matched witch ${buyer.id} (${newOrder.quantity} @ ${buyer.limitPrice})`
+                                } else {
+                                    m = `and ${buyer.id} (${bQuantity} @ ${buyer.limitPrice})`
+                                }
+                                 newBuyer = {
+                                    id: buyer.id,
+                                    side: buyer.side,
+                                    limitPrice: buyer.limitPrice,
+                                    quantity: bQuantity,
+                                    message: '',
+                                    active: true,
+                                }
+                                 updOrder = {
+                                    id: newOrder.id,
+                                    side: newOrder.side,
+                                    limitPrice: newOrder.limitPrice,
+                                    quantity: ordQuantity,
+                                    message: ` ${newOrder.message} ${m}`,
+                                    active: false,
+                                }
+                                 newBuyers = [...updBuyers, newBuyer, updOrder]
+                                setOrders(newBuyers)
+                            }
+                        } else {
+                            tmp += 1;
+                        }
+                    }
+                    if(tmp === length) {
+                        const newOrders = [...orders, newOrder];
+                        setOrders(newOrders);
+                    }
+                } 
+            }  if (newOrder.side === 'Cancel') {
+                cancelOrder(newOrder.id)
+            }
+            // } else {
+            //     const newOrders = [...orders, newOrder];
+            //         setOrders(newOrders);
+            // }
+            
     };
 
-    const addOrderToSide = (order) => {
-        if (order.side === "Buy") {
-            const newBuyers = [...buyers, order]
-            setBuyers(newBuyers)
-            checkSellers(order)
-        }
-        if (order.side === "Sell") {
-            const newSellers = [...sellers, order];
-            setSellers(newSellers)
-            checkBuyers(order)
-        }
-        if (order.side === "Cancel") {
-            cancelOrder(order.id)
-        }
-    }
-
-    const checkSellers = (order) => {
-        if (sellers.length) {
-            const newSellers = sellers.slice();
-            const matchingSellers = newSellers.filter(item => parseInt(item.limitPrice) <= parseInt(order.limitPrice));
-            sortMatchingSellers(matchingSellers)
-            for (let seller of matchingSellers) {
-                if (seller.quantity <= order.quantity && seller.active) {
-                    const newQuantity = order.quantity - seller.quantity;
-                    if(newQuantity < 0) {
-                        continue;
-                    }
-                    const newOrder = {
-                        ...order,
-                        quantity: newQuantity,
-                        message: `Fully matched with ${seller.id} ${seller.quantity} @ ${seller.limitPrice} `
-                    }
-                    const newSeller = {
-                        ...seller,
-                        quantity: 0,
-                        active: setActive(false)
-                    }
-                    const newSellers = sellers.filter(item => item.id !== seller.id);
-                    const n = [...newSellers, newSeller]
-                    setSellers(n);
-                    const newBuyers = buyers.filter(item => item.id !== order.id);
-                    const b = [...newBuyers, newOrder]
-                    setBuyers(b);
-                }
-
-                if (seller.quantity > order.quantity && seller.active) {
-                    const newQuantity = seller.quantity - order.quantity;
-                    if(newQuantity < 0) {
-                        continue;
-                    }
-                    const newOrder = {
-                        ...order,
-                        quantity: 0,
-                        active: setActive(false),
-                        message: `Fully matched with ${seller.id} ${seller.quantity} @ ${seller.limitPrice} `
-                    }
-                    const newSeller = {
-                        ...seller,
-                        quantity: newQuantity,
-                    }
-                    const newSellers = sellers.filter(item => item.id !== seller.id);
-                    const n = [...newSellers, newSeller]
-                    setSellers(n);
-                    const newBuyers = buyers.filter(item => item.id !== order.id);
-                    const b = [...newBuyers, newOrder]
-                    setBuyers(b);
-                }
-            }
-            
-        }
-    }
-    const checkBuyers = (order) => {
-        if (buyers.length) {
-            const newBuyers = buyers.slice();
-            const matchingBuyers = newBuyers.filter(item => parseInt(item.limitPrice) >= parseInt(order.limitPrice));
-            sortMatchingSellers(matchingBuyers)
-            for (let buyer of matchingBuyers) {
-                if (buyer.quantity <= order.quantity && buyer.active) {
-                    const newQuantity = order.quantity - buyer.quantity;
-                    if(newQuantity < 0) {
-                        continue;
-                    }
-                    const newOrder = {
-                        ...order,
-                        quantity: newQuantity,
-                        message: `Fully matched with ${buyer.id} ${buyer.quantity} @ ${buyer.limitPrice}`
-                    }
-                    const newBuyer = {
-                        ...buyer,
-                        quantity: 0,
-                        active: setActive(false)
-                    }
-                    const newBuyers = buyers.filter(item => item.id !== buyer.id);
-                    const n = [...newBuyers, newBuyer]
-                    setBuyers(n);
-                    const newSellers = sellers.filter(item => item.id !== order.id);
-                    const b = [...newSellers, newOrder]
-                    setSellers(b);
-                }
-
-                if (buyer.quantity > order.quantity && buyer.active) {
-                    const newQuantity = buyer.quantity - order.quantity;
-                    if(newQuantity < 0) {
-                        continue;
-                    }
-                    const newOrder = {
-                        ...order,
-                        quantity: 0,
-                        active: setActive(false),
-                        message: `Fully matched with ${buyer.id} ${buyer.quantity} @ ${buyer.limitPrice}`
-                    }
-                    const newBuyer = {
-                        ...buyer,
-                        quantity: newQuantity,
-                    }
-                    const newBuyers = buyers.filter(item => item.id !== buyer.id);
-                    const n = [...newBuyers, newBuyer]
-                    setBuyers(n);
-                    const newSellers = sellers.filter(item => item.id !== order.id);
-                    const b = [...newSellers, newOrder]
-                    setSellers(b);
-                }
-            }
-            
-        }
-    }
-    const sortMatchingSellers = (matchingSellers) => {
-        matchingSellers.sort((A, B) => A.quantity - B.quantity);
+    
+    const sortOrders = (orders) => {
+        orders.sort((A, B) => B.limitPrice - A.limitPrice);
     }
 
     const cancelOrder = (id) => {
-       setBuyers(buyers.filter(item => item.id !== id))
-       setSellers(sellers.filter(item => item.id !== id))
+        const orderArray = orders.filter(item => item.id === id);
+        const order = orderArray[0];
+        console.log('cancel order ', order)
+        const newOrders = orders.filter(item => item.id !== id);
+        console.log('cancel  newOrders',newOrders)
+       if(!order.active) {
+           const newOrder = {
+               id: order.id,
+               side: order.side,
+               limitPrice: order.limitPrice,
+               quantity: order.quantity,
+               active: false,
+               message: "Failed - no such active order"
+           }
+            const updOrders = [...newOrders, newOrder];
+            setOrders(updOrders)
+       } if(order.active && parseInt(order.quantity) > 0) {
+           const newOrder = {
+                id: order.id,
+                side: order.side,
+                limitPrice: order.limitPrice,
+                quantity: order.quantity,
+                active: false,
+                 message:  `${order.id} Cancelled`
+           }
+           const updOrders = [...newOrders, newOrder];
+           setOrders(updOrders)
+       } if (parseInt(order.quantity) === 0) {
+        const newOrder = {
+            id: order.id,
+                side: order.side,
+                limitPrice: order.limitPrice,
+                quantity: order.quantity,
+                active: false,
+            message: 'Failed - already fully filled'
+        }
+        const updOrders = [...newOrders, newOrder];
+        setOrders(updOrders)
+       }
     }
 
-    const changeOrders = (orders, index, q) => {
-        const newOrders = orders.slice();
-        const order = newOrders[index];
-        const newOrder = {
-          ...order,
-          quantity: q,
-        };
-        newOrders[index] = newOrder;
-          return newOrders;
-        };
 
     return (
         <div>
@@ -196,6 +280,7 @@ export const Add = ({ orders, setOrders, buyers, setBuyers, sellers, setSellers 
                 <InputComponent
                     label="LimitPrice"
                     state={limitPrice}
+                    type="number"
                     setState={setLimitPrice}
                 />
 

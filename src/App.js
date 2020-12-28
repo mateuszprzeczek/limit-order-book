@@ -15,9 +15,9 @@ function App() {
 
   console.log('orders   ', orders)
   console.log('sellers   ', sellers)
+  
 
-  const orderComponents = orders.map((order) => {
-    console.log(order)
+  const orderComponents = orders.map(order => {
     return (
       <div className="row" key={order.id}>
         <Order
@@ -29,50 +29,51 @@ function App() {
         />
         <hr />
       </div>
-    );
-});
-  const buyerComponents = buyers.map((order) => {
-    console.log(order)
-    return (
-      <div className="buyer" key={order.id}>
-        <Order
-            id={order.id}
-            side={order.side}
-            limitPrice={order.limitPrice}
-            quantity={order.quantity}
-            message={order.message}
-        />
-        <hr />
-      </div>
-    );
-});
+    )
+  })
+  
 
-  const sellersComponent = sellers.map((seller) => {
-    return (
-      <div className="seller" key={seller.id}>
-       <Order 
-        id={seller.id}
-        side={seller.side}
-        limitPrice={seller.limitPrice}
-        quantity={seller.quantity}
-        message={seller.message}
-       />
-     </div>
-   )
-  });
+
+//   const buyerComponents = buyers.map((order) => {
+//     console.log('buyer' ,order)
+//     return (
+//       <div className="buyer" key={order.id}>
+//         <Order
+           
+//             message={order.message}
+//         />
+//         <hr />
+//       </div>
+//     );
+// });
+
+//   const sellersComponent = sellers.map((seller) => {
+//     console.log('seller', seller)
+//     return (
+//       <div className="seller" key={seller.id}>
+//        <Order 
+        
+//         message={seller.message}
+//        />
+//      </div>
+//    )
+//   });
 
   return (
     <div className="App">
-     <Link to="/">
+     <Link to="/limit-order-book">
                     <h1>Limit Order Book v1</h1>
                 </Link>
                 <Router>
-                    <Add orders={orders} setOrders={setOrders} buyers={buyers} setBuyers={setBuyers} sellers={sellers} setSellers={setSellers} path="/"></Add>
+                    <Add orders={orders} setOrders={setOrders} buyers={buyers} setBuyers={setBuyers} sellers={sellers} setSellers={setSellers} path="/limit-order-book"></Add>
                     <Inventory orders={orders} path="/" />
                 </Router>
-                {/* {orderComponents} */}
-                {buyerComponents}
-                {sellersComponent}
+                {orderComponents}
+                <div className="row">
+                {/* {buyerComponents}
+                {sellersComponent} */}
+
+                </div>
     </div>
   );
 }
